@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "NLP概念.md",
+                "file": "Transformer架构.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "NLP概念"
+              "title": "Transformer架构"
             }
           }
         ]
@@ -78,7 +78,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 300,
+    "collapsed": true
   },
   "right": {
     "id": "d6da57afc1db92ab",
@@ -127,13 +128,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "NLP概念.md",
+                "file": "Transformer架构.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "NLP概念 的大纲"
+              "title": "Transformer架构 的大纲"
             }
           },
           {
@@ -186,6 +187,19 @@
   },
   "active": "5c075727a14ae500",
   "lastOpenFiles": [
-    "NLP概念.md"
+    "code/Transformer/README.md",
+    "code/Transformer/Transformer.py.tmp.21808.9b1fa7539bb8",
+    "code/Transformer/config.py.tmp.21808.811c67c2d44d",
+    "code/Transformer/Decoder.py.tmp.21808.03c19c621292",
+    "code/Transformer/Transformer.py.tmp.21808.bf950a37106f",
+    "code/Transformer/Decoder.py.tmp.21808.b1500a4e7dcf",
+    "code/Transformer/Encoder.py.tmp.21808.49270533950f",
+    "code/Transformer/Norm.py.tmp.21808.aa5b20e9674f",
+    "code/Transformer/Norm.py.tmp.21808.7648e46aebb2",
+    "code/Transformer/FFN.py.tmp.21808.1403c2fb2d9a",
+    "code/Transformer/PE.py.tmp.21808.4316deb63a89",
+    "code/Transformer/CLAUDE.md",
+    "NLP概念.md",
+    "Transformer架构.md"
   ]
 }

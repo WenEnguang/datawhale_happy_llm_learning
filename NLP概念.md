@@ -123,6 +123,7 @@ def train_tokenizer():
 			for line in f:
 				if random_seed.random() < sample_ratio:
 					data = json.loads(line)
+					
 	file_path = os.path.json("Datasetfile_path",'xxx.jsonl')
 	
 	# 2、初始化分词器
