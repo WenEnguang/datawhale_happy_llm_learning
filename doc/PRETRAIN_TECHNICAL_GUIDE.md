@@ -167,7 +167,7 @@ pretrain_{dim}_{n_layers}_{vocab_size}_step{step}.pth
 仍建议后续处理：
 
 - 统一 `code/PLM` 文件编码和注释，避免不同终端下中文显示异常。
-- 清理 `ddp_model.py` 中已改名为 `_legacy_get_lr` 的历史学习率实现，保留一个清晰版本。
+- 继续统一 `ddp_model.py` 中训练循环相关注释和命名，保持一个清晰版本。
 - 增加最小化 smoke test：tokenizer 加载、dataset 单样本、model forward、单步训练。
 - 将大语料加载改为流式或离线 tokenized 格式，避免一次性加载占用过多内存。
 - 明确 `vocab_size` 与 tokenizer 词表大小的同步策略。

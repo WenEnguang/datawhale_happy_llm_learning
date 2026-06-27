@@ -44,7 +44,7 @@ python -m py_compile code/PLM/config.py code/PLM/dataset.py code/PLM/k_model.py 
 
 ## 5. 当前已知风险
 
-- `ddp_model.py` 里保留了已改名为 `_legacy_get_lr` 的历史版学习率函数；建议后续统一清理。
+- `ddp_model.py` 的学习率调度当前只保留一个 `get_lr`；后续修改训练参数时，需要同步检查 warmup、最小学习率和总步数计算。
 - `download_dataset.sh` 中包含固定 Linux 路径，公开前建议改为相对路径或参数化。
 - `train_tokenizer.py` 默认 `data_path = config.data_dir` 是目录，重新训练 tokenizer 前需要改成具体 JSONL 文件。
 - `PretrainDataset` 当前一次性加载所有数据，语料变大后会产生内存压力。
