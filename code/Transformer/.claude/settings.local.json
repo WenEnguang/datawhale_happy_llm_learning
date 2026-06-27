@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(D:/MiniConda/envs/langchain/python.exe -c ' *)",
+      "Bash(D:/MiniConda/envs/langchain/python.exe Transformer.py)"
+    ]
+  }
+}

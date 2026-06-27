@@ -1,0 +1,10 @@
+# 忽略数据文件
+dataset/
+
+# 忽略日志文件
+logs/
+pycache/
+*.pyc
+
+# 忽略掉脚本
+*.sh
