@@ -17,7 +17,7 @@ from dataset import PretrainDataset
 
 import swanlab
 
-from config import Config
+from config import Config, data_dir, tokenizer_dir, model_dir
 
 # 忽略警告信息
 warnings.filterwarnings("ignore")
@@ -31,7 +31,7 @@ def Logger(content):
     '''
     print(f'日志记录：{content}')
 
-def get_lr(it, all):
+def _legacy_get_lr(it, all):
     """
     计算当前迭代的学习率，使用余弦退火调度策略
     
@@ -64,6 +64,24 @@ def get_lr(it, all):
     assert 0 <= decay_ratio <= 1
     coeff = 0.5 * (1.0 + math.cos(math.pi * decay_ratio))  # 余弦系数
     return min_lr + coeff * (Config().learning_rate - min_lr)
+
+
+def get_lr(it, total_steps):
+    """Cosine learning-rate schedule with optional warmup."""
+    warmup_iters = args.warmup_iters
+    lr_decay_iters = max(total_steps, warmup_iters + 1)
+    min_lr = args.learning_rate / 10
+
+    if it < warmup_iters:
+        return args.learning_rate * it / max(1, warmup_iters)
+
+    if it > lr_decay_iters:
+        return min_lr
+
+    decay_ratio = (it - warmup_iters) / max(1, lr_decay_iters - warmup_iters)
+    decay_ratio = min(max(decay_ratio, 0), 1)
+    coeff = 0.5 * (1.0 + math.cos(math.pi * decay_ratio))
+    return min_lr + coeff * (args.learning_rate - min_lr)
 
 
 def train_epoch(epoch):
@@ -144,7 +162,7 @@ def train_epoch(epoch):
         if (step + 1) % args.save_interval == 0:
             model.eval()  # 切换到评估模式
             # 构建检查点文件名
-            ckp = f'{args.save_dir}/pretrain_{llm_config.dim}_{llm_config.n_layers}_{llm_config.vocab_size}.pth'
+            ckp = f'{args.save_path}/pretrain_{llm_config.dim}_{llm_config.n_layers}_{llm_config.vocab_size}.pth'
 
             # 处理多卡保存：如果是DataParallel模型，需要访问.module属性
             state_dict = model.module.state_dict() if isinstance(model, torch.nn.DataParallel) else model.state_dict()
@@ -155,7 +173,7 @@ def train_epoch(epoch):
         if (step + 1) % 20000 == 0:
             model.eval()
             # 构建带步数的检查点文件名
-            ckp = f'{args.save_dir}/pretrain_{llm_config.dim}_{llm_config.n_layers}_{llm_config.vocab_size}_step{step+1}.pth'
+            ckp = f'{args.save_path}/pretrain_{llm_config.dim}_{llm_config.n_layers}_{llm_config.vocab_size}_step{step+1}.pth'
 
             # 保存模型状态字典
             state_dict = model.module.state_dict() if isinstance(model, torch.nn.DataParallel) else model.state_dict()
@@ -189,7 +207,7 @@ def init_model():
         return sum(p.numel() for p in model.parameters() if p.requires_grad)
     
     # 从本地路径记载预训练的分词器
-    tokenizer = AutoTokenizer.from_pretrained(Config().tokenizer_dir, use_fast=True)
+    tokenizer = AutoTokenizer.from_pretrained(tokenizer_dir, use_fast=True)
     if tokenizer.pad_token_id is not None:
         llm_config.pad_token_id = tokenizer.pad_token_id
     
@@ -223,7 +241,7 @@ if __name__ == "__main__":
     # 实验跟踪和数据加载参数
     parser.add_argument("--use_swanlab", action="store_true", help="是否使用SwanLab进行实验跟踪")
     parser.add_argument("--num_workers", type=int, default=4, help="数据加载的工作线程数")
-    parser.add_argument("--data_path", type=str, default=os.path.join(Config.data_dir,'train.json'), help="训练数据路径")
+    parser.add_argument("--data_path", type=str, default=os.path.join(data_dir, 'train.json'), help="训练数据路径")
 
     # 训练优化参数
     parser.add_argument("--accumulation_steps", type=int, default=8, help="梯度累积步数")
@@ -233,7 +251,7 @@ if __name__ == "__main__":
     # 日志和保存参数
     parser.add_argument("--log_interval", type=int, default=10, help="日志记录间隔")
     parser.add_argument("--save_interval", type=int, default=1000, help="模型保存间隔")
-    parser.add_argument("--save_path", type=str, default=os.path.join(Config.model_dir), help="模型保存路径")
+    parser.add_argument("--save_path", type=str, default=os.path.join(model_dir), help="模型保存路径")
 
     # 多GPU并行训练参数
     parser.add_argument("--gpus", type=str, default='0,1,2,3,4,5,6,7', help="使用的GPU ID，用逗号分隔 (例如: '0,1,2')")
@@ -282,7 +300,7 @@ if __name__ == "__main__":
     model, tokenizer = init_model()
     
     # 创建训练数据集
-    train_ds = PretrainDataset(args.data_path, tokenizer, max_length=max_seq_len)
+    train_ds = PretrainDataset(args.data_path, tokenizer, max_len=max_seq_len)
     
     # 创建数据加载器
     train_loader = DataLoader(

@@ -29,7 +29,7 @@ class PretrainDataset_1(Dataset):
     def __getitem__(self, idx):
         with open(self.data_path,'r',encoding='utf-8') as f:
             f.seek(self.offsets[idx])
-            line = f.readline().decode('utf-8').strip()
+            line = f.readline().strip()
         sample = json.loads(line)
         text = f"{self.tokenizer.bos_token}{sample['text']}"
         input_id =  self.tokenizer(text).data['input_ids'][:self.max_len]
@@ -53,6 +53,7 @@ class PretrainDataset(Dataset):
         self.data_path = data_path
         self.max_len = max_len
         bos_token = tokenizer.bos_token if tokenizer.bos_token is not None else ''
+        pad_token_id = tokenizer.pad_token_id if tokenizer.pad_token_id is not None else 0
 
         self.all_ids = []   # 存放所有样本的token id list
         self.all_masks = [] # 存放所有样本的loss mask list
@@ -73,7 +74,7 @@ class PretrainDataset(Dataset):
 
                 text_len = len(ids)
                 padding_len = max_len - text_len
-                ids = ids + [tokenizer.pad_token_id] * padding_len
+                ids = ids + [pad_token_id] * padding_len
                 loss_mask = [1] * text_len + [0] * padding_len
 
                 self.all_ids.append(ids)
